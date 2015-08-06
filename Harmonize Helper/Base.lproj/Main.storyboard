@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14F6a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Key assist:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wLV-yf-GsM">
+                                <rect key="frame" x="16" y="95" width="83" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="K0k-91-zte">
+                                <rect key="frame" x="107" y="90" width="51" height="31"/>
+                                <connections>
+                                    <action selector="keyAssistValueChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="R4a-zL-Yna"/>
+                                </connections>
+                            </switch>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VQM-9r-L2s" userLabel="piano" customClass="HHPianoView">
+                                <rect key="frame" x="0.0" y="175" width="600" height="250"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="250" id="btX-kh-8Gw"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="wLV-yf-GsM" firstAttribute="centerY" secondItem="K0k-91-zte" secondAttribute="centerY" id="BK2-wg-b27"/>
+                            <constraint firstAttribute="centerY" secondItem="VQM-9r-L2s" secondAttribute="centerY" id="Dac-E4-vOU"/>
+                            <constraint firstItem="VQM-9r-L2s" firstAttribute="top" secondItem="wLV-yf-GsM" secondAttribute="bottom" constant="59" id="bDg-dq-1PD"/>
+                            <constraint firstItem="wLV-yf-GsM" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="fFb-EH-FjH"/>
+                            <constraint firstItem="VQM-9r-L2s" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="mlE-mH-LkZ"/>
+                            <constraint firstAttribute="centerX" secondItem="VQM-9r-L2s" secondAttribute="centerX" id="qZX-aL-CCg"/>
+                            <constraint firstItem="K0k-91-zte" firstAttribute="leading" secondItem="wLV-yf-GsM" secondAttribute="trailing" constant="8" id="vVa-GV-Kde"/>
+                            <constraint firstAttribute="trailing" secondItem="VQM-9r-L2s" secondAttribute="trailing" id="wjg-fb-WUi"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="piano" destination="VQM-9r-L2s" id="cro-xG-JI7"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="396" y="453"/>
+        </scene>
+    </scenes>
+</document>
