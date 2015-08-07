@@ -3,6 +3,7 @@
 
 target 'Harmonize Helper' do
     pod 'LGHelper', '~> 1.0'
+    pod 'StreamingKit', '~> 0.1'
 end
 
 target 'Harmonize HelperTests' do

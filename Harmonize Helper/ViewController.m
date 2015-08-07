@@ -17,16 +17,25 @@
 
 @implementation ViewController
 
+#pragma mark - Initialization
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
 }
 
+#pragma mark - Controls
 
 - (IBAction)keyAssistValueChanged:(UISwitch *)sender {
     self.piano.keyAssist = sender.isOn;
     [self.piano setNeedsDisplay];
 }
+
+- (IBAction)pianoOffsetChanged:(UISlider *)sender {
+    [self.piano shiftOffsetTo:sender.value];
+}
+
+
+#pragma mark - Rotation
 
 -(void)viewWillLayoutSubviews
 {

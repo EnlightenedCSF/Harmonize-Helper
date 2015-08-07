@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2E3C9569EBD3D144918A1E6A"
+               BlueprintIdentifier = "C6C8768081AB93DB940BC005"
                BuildableName = "libPods-Harmonize Helper.a"
                BlueprintName = "Pods-Harmonize Helper"
                ReferencedContainer = "container:Pods.xcodeproj">

@@ -11,12 +11,20 @@
 #import "HHKeyboard.h"
 
 #import <LGHelper.h>
+#import <STKAudioPlayer.h>
 
+#define WHITE_KEYS_COUNT 52
 #define WIDTH_HEIGHT_RATIO 5.0f
 
-@interface HHPianoView ()
+#define NUMBER_IN_FILENAME 39148
+#define REST_OF_THE_FILENAME @"__jobro__piano-ff-0"
+
+@interface HHPianoView () <STKAudioPlayerDelegate>
 
 @property (weak, nonatomic) HHKeyboard *keyboard;
+
+//@property (strong, nonatomic) STKAudioPlayer *player;
+@property (strong, nonatomic) NSMutableArray *players;
 
 @property (assign, nonatomic) CGFloat offsetX;
 @property (assign, nonatomic) NSInteger firstWhiteKeyIndex;
@@ -30,6 +38,8 @@
 @property (assign, nonatomic) CGFloat blackKeyWidth;
 @property (assign, nonatomic) CGFloat blackKeyHeight;
 
+@property (assign, nonatomic) CGFloat keyboardWidth;
+
 @property (assign, nonatomic) CGFloat keyAssistLabelOffsetX;
 @property (assign, nonatomic) CGFloat keyAssistLabelOffsetY;
 @property (assign, nonatomic) CGFloat keyAssistLabelWidth;
@@ -37,6 +47,7 @@
 
 @property (strong, nonatomic) NSArray *keyAssistLabelColors;
 
+@property (assign, nonatomic) BOOL isSingleTapHolding;
 @property (strong, nonatomic) NSMutableArray *highlightedWhiteKeys;
 @property (strong, nonatomic) NSMutableArray *highlightedBlackKeys;
 
@@ -45,6 +56,7 @@
 @implementation HHPianoView
 
 @synthesize firstWhiteKeyIndex = _firstWhiteKeyIndex;
+@synthesize keyWidth = _keyWidth;
 
 #pragma mark - Initialization
 
@@ -62,6 +74,11 @@
 
 -(void)setup
 {
+    //_player = [[STKAudioPlayer alloc] init];
+    self.multipleTouchEnabled = YES;
+    
+    _players = [NSMutableArray array];
+    
     _keyAssist = YES;
     _offsetX = 0;
     _firstWhiteKeyIndex = 0;
@@ -70,7 +87,7 @@
     _keyboard = [HHKeyboard sharedKeyboard];
     
     _keyHeight = self.bounds.size.height < self.bounds.size.width ? self.bounds.size.height : self.bounds.size.width;
-    _keyWidth = _keyHeight / WIDTH_HEIGHT_RATIO;
+    self.keyWidth = _keyHeight / WIDTH_HEIGHT_RATIO;
     
     _blackKeyShift = _keyWidth / 3.0f * 2.0f;
     _blackKeyHeight = _keyHeight * 0.62f;
@@ -93,15 +110,21 @@
                                ];
     _highlightedWhiteKeys = [NSMutableArray arrayWithArray:@[]];
     _highlightedBlackKeys = [NSMutableArray arrayWithArray:@[]];
+    _isSingleTapHolding = NO;
 }
 
 -(void)setOffsetX:(CGFloat)offsetX
 {
     _offsetX = offsetX;
-    _firstWhiteKeyIndex = offsetX / _keyWidth;
+    _firstWhiteKeyIndex = abs((int)(offsetX / _keyWidth));
     _isPreviousBlackKeyVisible = ((int)round(offsetX) % (int)round(_keyWidth)) <= _blackKeyWidth/2.0f;
 }
 
+-(void)setKeyWidth:(CGFloat)keyWidth
+{
+    _keyWidth = keyWidth;
+    _keyboardWidth = keyWidth * WHITE_KEYS_COUNT;
+}
 
 #pragma mark - Drawing
 
@@ -117,7 +140,7 @@
         [self drawKeyAssistLabels];
     }
     
-    if (self.highlightedWhiteKeys.count > 0 || self.highlightedBlackKeys.count > 0) {
+    if (_isSingleTapHolding && (self.highlightedWhiteKeys.count > 0 || self.highlightedBlackKeys.count > 0)) {
         [self drawHighlightedKeys];
     }
 }
@@ -132,8 +155,10 @@
     [[HHColors whiteKeyColor] setFill];
     [[HHColors blackKeyColor] setStroke];
     
-    for (NSInteger i = 0; i < _whiteKeysCount; ++i) {
-        UIBezierPath *whiteKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(_offsetX + i*_keyWidth, // x
+    CGFloat s = - (int)round(-_offsetX) % (int)round(_keyWidth);
+    
+    for (NSInteger i = 0; i < _whiteKeysCount + 1; ++i) {
+        UIBezierPath *whiteKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(s + i*_keyWidth,       // x
                                                                                  0,                     // y
                                                                                  _keyWidth,
                                                                                  _keyHeight)];
@@ -146,21 +171,21 @@
     [[UIColor blackColor] setStroke];
 
     
-//    | ## ## | ## ## ## |
-//    | ## ## | ## ## ## |
+    //    | ## ## | ## ## ## |
+    //    | ## ## | ## ## ## |
     
     for (NSInteger i = 0; i < _whiteKeysCount + 1; ++i) {
-        
-        if (i == 0 && !_isPreviousBlackKeyVisible) {
-            continue;
-        }
         
         if ([self indexIsBad:i]) {
             continue;
         }
         
-        UIBezierPath *blackKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(_offsetX + i*_keyWidth + _blackKeyShift,   // x
-                                                                                 0,                                         // y
+        CGFloat s = (int)round(-_offsetX) % (int)round(_keyWidth);
+        s = _keyWidth - s;
+        s -= _blackKeyWidth/2.0f;
+        
+        UIBezierPath *blackKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(s + i*_keyWidth,
+                                                                                 0,
                                                                                  _blackKeyWidth,
                                                                                  _blackKeyHeight)];
         [blackKeyPath fill];
@@ -170,21 +195,23 @@
 
 -(BOOL)indexIsBad:(NSInteger)i
 {
-    NSInteger realKeyIndex = [_keyboard indexOfKeyByWhiteKeyNumber:_firstWhiteKeyIndex + i];
+    NSInteger realKeyIndex = [_keyboard indexOfKeyByWhiteKeyNumber:(_firstWhiteKeyIndex + i)];
     return ![_keyboard hasKeySharpAtIndex:realKeyIndex];
 }
 
 -(void)drawKeyAssistLabels
 {
+    CGFloat s = - (int)round(-_offsetX) % (int)round(_keyWidth);
+
     for (NSInteger i = 0; i < _whiteKeysCount; ++i)
     {
-        CGRect keyAssistLabelRect = CGRectMake(_offsetX + i*_keyWidth + _keyAssistLabelOffsetX,
+        CGRect keyAssistLabelRect = CGRectMake(s + i*_keyWidth + _keyAssistLabelOffsetX,  //_offsetX + i*_keyWidth + _keyAssistLabelOffsetX,
                                                _keyAssistLabelOffsetY,
                                                _keyAssistLabelWidth,
                                                _keyAssistLabelHeight);
         
         UIBezierPath *rect = [UIBezierPath bezierPathWithRect:keyAssistLabelRect];
-        NSString *keyString = [_keyboard getKeyAtIndex:[_keyboard indexOfKeyByWhiteKeyNumber:i]];
+        NSString *keyString = [_keyboard getKeyAtIndex:[_keyboard indexOfKeyByWhiteKeyNumber:(_firstWhiteKeyIndex + i)]];
         [[_keyAssistLabelColors objectAtIndex:[_keyboard getNoteIndexInOctave:keyString]] setFill];
         
         [rect fill];
@@ -217,18 +244,16 @@
     }
 }
 
+#pragma mark - Highlighting
+
 -(void)highlightKeyWithIndex:(NSInteger)index
 {
     if ([_keyboard isKeyWhiteAtIndex:index]) {
         NSInteger whiteIndex = [_keyboard whiteKeyIndexByIndexOfKey:index];
-        whiteIndex -= _firstWhiteKeyIndex;
-
         [self.highlightedWhiteKeys addObject:@(whiteIndex)];
     }
     else {
         NSInteger whiteIndex = [_keyboard whiteKeyIndexByIndexOfKey:index+1];
-        whiteIndex -= _firstWhiteKeyIndex;
-        
         [self.highlightedBlackKeys addObject:@(whiteIndex)];
     }
 }
@@ -243,7 +268,6 @@
     
     if (firstScaleNote <= lastVisibleKeyIndex || lastScaleNote >= firstVisibleKeyIndex) { // if any of the scale
         
-        NSLog(@"It's visible");
         for (NSInteger i = 0; i < indexes.count; ++i) {
             [self highlightKeyWithIndex:[indexes[i] integerValue]];
         }
@@ -252,36 +276,132 @@
     }
 }
 
+-(void)clearHighlights {
+    [self.highlightedBlackKeys removeAllObjects];
+    [self.highlightedWhiteKeys removeAllObjects];
+}
+
 #pragma mark - Gesture recognition
+
+-(NSInteger)getIndexOfKeyPressed:(UITouch *)touch
+{
+    CGPoint locationInView = [touch locationInView:self];
+    CGFloat oneKeyOffset = (int)round(_offsetX) % (int)round(_keyWidth);
+
+    if (locationInView.y > _blackKeyHeight)  //white key processing
+    {
+        int whiteKeyIndex = (int)(locationInView.x - oneKeyOffset) / (int)round(_keyWidth);
+        whiteKeyIndex += _firstWhiteKeyIndex;
+        
+        return [_keyboard indexOfKeyByWhiteKeyNumber:whiteKeyIndex];
+    }
+    else
+    {
+        int blackKeyIndex = (int)(locationInView.x - oneKeyOffset - _blackKeyShift) / (int)round(_keyWidth);
+        blackKeyIndex += _firstWhiteKeyIndex;
+        return [_keyboard indexOfKeyByWhiteKeyNumber:blackKeyIndex andSharp:YES];
+    }
+}
+
+-(void)processSingleTouch:(UITouch *)touch
+{
+    NSArray *highlights;
+    NSInteger index = [self getIndexOfKeyPressed:touch];
+    if ([_keyboard isKeyWhiteAtIndex:index]) {
+        highlights = [_keyboard test_scale_major_with_index:index];
+    }
+    else {
+        highlights = [_keyboard test_scale_major_with_index:index];
+    }
+    [self clearHighlights];
+    [self highlightKeysWithIndexes:highlights];
+    
+    [self playKeyWithIndex:index];
+}
+
+-(void)processDoubleTouch:(NSSet *)touches
+{
+    NSArray *twoTouches = [touches allObjects];
+    UITouch *first = twoTouches[0];
+    UITouch *second = twoTouches[1];
+    
+    NSInteger index1 = [self getIndexOfKeyPressed:first];
+    NSInteger index2 = [self getIndexOfKeyPressed:second];
+    
+    NSInteger distance = [_keyboard getDistanceBetweenNotesWithIndex:index1 andIndex:index2];
+    
+    NSLog(@"The distance is: %lu", distance);    
+}
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    UITouch *touch = [[event allTouches] anyObject];
-    CGPoint locationInView = [touch locationInView:self];
-    
-    if (locationInView.y > _blackKeyHeight) { //white key processing
+    switch (event.allTouches.count) {
         
-        CGFloat oneKeyOffset = (int)round(_offsetX) % (int)round(_keyWidth);
-        int whiteKeyIndex = (int)(locationInView.x - oneKeyOffset) / (int)round(_keyWidth);
-        NSLog(@"Index: %i", whiteKeyIndex);
-        
-        [_keyboard test_scale_major_with_index:[_keyboard indexOfKeyByWhiteKeyNumber:whiteKeyIndex] completion:^(NSArray *indexes)
-        {
-            NSLog(@"Scale is: %@", indexes);
-            [self.highlightedWhiteKeys removeAllObjects];
-            [self.highlightedBlackKeys removeAllObjects];
+        // single tap; showing scale
+        case 1: {
+            NSLog(@"Single began");
+            _isSingleTapHolding = YES;
+            UITouch *touch = [[event allTouches] anyObject];
+            [self processSingleTouch:touch];
+            break;
+        }
             
-            [self highlightKeysWithIndexes:indexes];
-        }];
+        // double tap; showing interval
+        case 2: {
+            if (_isSingleTapHolding) {
+                [self clearHighlights];
+            }
+            
+            NSLog(@"Double began");
+            [self processDoubleTouch:event.allTouches];
+            break;
+        }
+            
+        // 3 or 4; showing chord
+        case 3:
+        case 4: {
+            NSLog(@"Triple began");
+            
+            break;
+        }
+        default:
+            break;
     }
-    else {
-        NSLog(@"Black key was pressed");
-    }
+    [self setNeedsDisplay];
 }
 
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    
+    switch (event.allTouches.count) {
+        case 1: {
+            NSLog(@"Single ended");
+            _isSingleTapHolding = NO;
+            break;
+        }
+        case 2: {
+            NSLog(@"Double ended");
+            
+            UITouch *takenOff = [touches anyObject];
+            for (UITouch *touch in event.allTouches) {
+                if (takenOff != touch) {
+                    [self processSingleTouch:touch]; // process not the taken off, but the left on the screen finger
+                    break;
+                }
+            }
+            break;
+        }
+        case 3:
+        case 4: {
+            NSLog(@"Triple or more ended");
+            
+            break;
+        }
+        default:
+            break;
+    }
+    [self setNeedsDisplay];
 }
 
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -289,6 +409,55 @@
     
 }
 
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    NSLog(@"Cancelled");
+}
 
+#pragma mark - Playing sounds
+
+-(NSString *)getCorrectFileNameOfNoteWithIndex:(NSInteger)index
+{
+    int addition = NUMBER_IN_FILENAME + (int)index;
+    
+    ++index;
+    NSString *num = [NSString stringWithFormat:(index < 10 ? @"0%li" : @"%li"), (long)index];
+    
+    return [NSString stringWithFormat:@"%i%@%@.wav", addition, REST_OF_THE_FILENAME, num];
+}
+
+-(void)playKeyWithIndex:(NSInteger)index
+{
+    NSString *fileName = [self getCorrectFileNameOfNoteWithIndex:index];
+    
+    STKAudioPlayer *player = [[STKAudioPlayer alloc] init];
+    player.delegate = self;
+    [_players addObject:player];
+    
+    NSURL *url = kMainBundleDirectoryURL;
+    url = [url URLByAppendingPathComponent:fileName];
+    
+    [player play:[url absoluteString]];
+}
+
+#pragma mark - STK Delegate
+
+-(void)audioPlayer:(STKAudioPlayer *)audioPlayer didFinishPlayingQueueItemId:(NSObject *)queueItemId withReason:(STKAudioPlayerStopReason)stopReason andProgress:(double)progress andDuration:(double)duration
+{
+    [_players removeObject:audioPlayer];
+}
+
+-(void)audioPlayer:(STKAudioPlayer *)audioPlayer didFinishBufferingSourceWithQueueItemId:(NSObject *)queueItemId {}
+-(void)audioPlayer:(STKAudioPlayer *)audioPlayer didStartPlayingQueueItemId:(NSObject *)queueItemId {}
+-(void)audioPlayer:(STKAudioPlayer *)audioPlayer stateChanged:(STKAudioPlayerState)state previousState:(STKAudioPlayerState)previousState {}
+-(void)audioPlayer:(STKAudioPlayer *)audioPlayer unexpectedError:(STKAudioPlayerErrorCode)errorCode {}
+
+#pragma mark - Controls
+
+-(void)shiftOffsetTo:(CGFloat)value
+{
+    self.offsetX = -value * (_keyboardWidth - self.bounds.size.width - 120);
+//    NSLog(@"Value = %f; Offset is %f; width is %f", value, self.offsetX, self.bounds.size.width);
+    [self setNeedsDisplay];
+}
 
 @end

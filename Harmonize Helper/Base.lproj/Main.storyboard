@@ -37,6 +37,12 @@
                                     <constraint firstAttribute="height" constant="250" id="btX-kh-8Gw"/>
                                 </constraints>
                             </view>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="lig-fP-WiT">
+                                <rect key="frame" x="14" y="433" width="572" height="31"/>
+                                <connections>
+                                    <action selector="pianoOffsetChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="mR4-Un-KJn"/>
+                                </connections>
+                            </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -45,8 +51,11 @@
                             <constraint firstItem="VQM-9r-L2s" firstAttribute="top" secondItem="wLV-yf-GsM" secondAttribute="bottom" constant="59" id="bDg-dq-1PD"/>
                             <constraint firstItem="wLV-yf-GsM" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="fFb-EH-FjH"/>
                             <constraint firstItem="VQM-9r-L2s" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="mlE-mH-LkZ"/>
+                            <constraint firstItem="lig-fP-WiT" firstAttribute="top" secondItem="VQM-9r-L2s" secondAttribute="bottom" constant="8" id="oyx-O6-bhG"/>
                             <constraint firstAttribute="centerX" secondItem="VQM-9r-L2s" secondAttribute="centerX" id="qZX-aL-CCg"/>
+                            <constraint firstItem="lig-fP-WiT" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="suL-We-l4I"/>
                             <constraint firstItem="K0k-91-zte" firstAttribute="leading" secondItem="wLV-yf-GsM" secondAttribute="trailing" constant="8" id="vVa-GV-Kde"/>
+                            <constraint firstItem="lig-fP-WiT" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="vui-KZ-tCa"/>
                             <constraint firstAttribute="trailing" secondItem="VQM-9r-L2s" secondAttribute="trailing" id="wjg-fb-WUi"/>
                         </constraints>
                     </view>

@@ -12,4 +12,6 @@
 
 @property (nonatomic, assign) BOOL keyAssist;
 
+-(void)shiftOffsetTo:(CGFloat)value;
+
 @end

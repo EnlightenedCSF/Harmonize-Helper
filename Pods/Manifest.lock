@@ -2,12 +2,15 @@ PODS:
   - LGHelper (1.0.1):
     - Reachability (~> 3.2)
   - Reachability (3.2)
+  - StreamingKit (0.1.25)
 
 DEPENDENCIES:
   - LGHelper (~> 1.0)
+  - StreamingKit (~> 0.1)
 
 SPEC CHECKSUMS:
   LGHelper: 54fd8c0437da034268a9987093289b3323eed2f5
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  StreamingKit: f00c054cfd0f59d88c8be7a2270e208302ce48c4
 
-COCOAPODS: 0.38.0
+COCOAPODS: 0.38.2

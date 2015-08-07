@@ -14,6 +14,43 @@ typedef enum : NSUInteger {
 } HHScale;
 
 typedef enum : NSUInteger {
+    HHIntervalPerfUnison = 0,
+    
+    HHIntervalMinSecond = 1,
+    HHIntervalMajSecond = 2,
+    
+    HHIntervalMinThird = 3,
+    HHIntervalMajThird = 4,
+    
+    HHIntervalPerfFourth = 5,
+    HHIntervalAugFourth = 6,
+    
+    HHIntervalDimFifth = 6,
+    HHIntervalPerfFifth = 7,
+    
+    HHIntervalMinSixth = 8,
+    HHIntervalMajSixth = 9,
+    
+    HHIntervalMinSeventh = 10,
+    HHIntervalMajSeventh = 11,
+    
+    HHIntervalPerfOctave = 12
+} HHInterval;
+
+typedef enum : NSUInteger {
+    HHChordMajor,
+    HHChordMinor,
+    HHChordAugmented,
+    HHChordDiminished,
+    HHChordDomSeventh,
+    HHChordMinSeventh,
+    HHChordMajSeventh,
+    HHChordAugSeventh,
+    HHChordDimSeventh,
+    HHChordHalfDimSeventh
+} HHChord;
+
+typedef enum : NSUInteger {
     HHScaleOutputFormatIndexes = 0,
     HHScaleOutputFormatKeys
 } HHScaleOutputFormat;
@@ -26,6 +63,7 @@ typedef enum : NSUInteger {
 -(BOOL)hasKeyFlatAtIndex:(NSInteger)index;
 -(BOOL)hasKeySharpAtIndex:(NSInteger)index;
 
+-(NSInteger)indexOfKeyByWhiteKeyNumber:(NSInteger)index andSharp:(BOOL)sharp;
 -(NSInteger)indexOfKeyByWhiteKeyNumber:(NSInteger)index;
 -(NSInteger)whiteKeyIndexByIndexOfKey:(NSInteger)index;
 
@@ -36,6 +74,8 @@ typedef enum : NSUInteger {
 -(NSArray *)getScaleOfRootByIndex:(NSInteger)root scale:(HHScale)scale outputFormat:(HHScaleOutputFormat)format;
 -(NSArray *)getScaleOfRootByIndex:(NSInteger)root scale:(HHScale)scale outputFormat:(HHScaleOutputFormat)format continious:(BOOL)continious;
 
--(void)test_scale_major_with_index:(NSInteger)index completion:(void (^)(NSArray *))completion;
+-(HHInterval)getDistanceBetweenNotesWithIndex:(NSInteger)index andIndex:(NSInteger)anotherIndex;
+
+-(NSArray *)test_scale_major_with_index:(NSInteger)index;
 
 @end

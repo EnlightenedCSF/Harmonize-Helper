@@ -11,7 +11,10 @@
 @interface HHKeyboard ()
 
 @property (strong, nonatomic) NSArray *keys;
+
 @property (strong, nonatomic) NSDictionary *scaleIntervals;
+@property (strong, nonatomic) NSDictionary *chordIntervals;
+
 @property (strong, nonatomic) NSDictionary *notesInOctave;
 
 @end
@@ -59,7 +62,6 @@
             }
         }
         [temp addObject:@"8C"];
-        NSLog(@"Total: %lu", (unsigned long)temp.count);
         
         self.keys = [temp copy];
         self.notesInOctave = @{ @"C": @(0),
@@ -75,17 +77,39 @@
                                 @(HHScaleMajor): @[@2,@2,@1,@2,@2,@2,@1],
                                 @(HHScaleMinor): @[@2,@1,@2,@2,@1,@2,@2]
                                 };
+        self.chordIntervals = @{
+                                @(HHChordMajor):            @[ @(HHIntervalMajThird), @(HHIntervalPerfFifth) ],
+                                @(HHChordMinor):            @[ @(HHIntervalMinThird), @(HHIntervalPerfFifth) ],
+                                
+                                @(HHChordAugmented):        @[ @(HHIntervalMajThird), @(HHIntervalMinSixth) ],
+                                @(HHChordDiminished):       @[ @(HHIntervalMinThird), @(HHIntervalDimFifth) ],
+                                
+                                @(HHChordDomSeventh):       @[ @(HHIntervalMajThird), @(HHIntervalPerfFifth), @(HHIntervalMinSeventh) ],
+                                @(HHChordMinSeventh):       @[ @(HHIntervalMinThird), @(HHIntervalPerfFifth), @(HHIntervalMinSeventh) ],
+                                @(HHChordMajSeventh):       @[ @(HHIntervalMajThird), @(HHIntervalPerfFifth), @(HHIntervalMajSeventh) ],
+                                
+                                @(HHChordAugSeventh):       @[ @(HHIntervalMajThird), @(HHIntervalMinSixth), @(HHIntervalMinSeventh) ],
+                                @(HHChordDimSeventh):       @[ @(HHIntervalMinThird), @(HHIntervalDimFifth), @(HHIntervalMajSixth) ],
+                                @(HHChordHalfDimSeventh):   @[ @(HHIntervalMinThird), @(HHIntervalDimFifth), @(HHIntervalMinSeventh) ],
+                               };
     }
     
     return self;
 }
 
-#pragma mark - Scales
+#pragma mark - Intervals
 
 -(NSArray *)getMelodicIntervalsOfScale:(HHScale)scale
 {
     return [self.scaleIntervals objectForKey:@(scale)];
 }
+
+-(HHInterval)getDistanceBetweenNotesWithIndex:(NSInteger)index andIndex:(NSInteger)anotherIndex
+{
+    return labs(index - anotherIndex);
+}
+
+#pragma mark - Scales
 
 -(NSArray *)getScaleOfRootByIndex:(NSInteger)root scale:(HHScale)scale outputFormat:(HHScaleOutputFormat)format
 {
@@ -135,6 +159,15 @@
 }
 
 #pragma mark - 
+
+-(NSInteger)indexOfKeyByWhiteKeyNumber:(NSInteger)index andSharp:(BOOL)sharp
+{
+    NSInteger newIndex = [self indexOfKeyByWhiteKeyNumber:index];
+    if (sharp) {
+        ++newIndex;
+    }
+    return newIndex;
+}
 
 -(NSInteger)indexOfKeyByWhiteKeyNumber:(NSInteger)index
 {
@@ -190,6 +223,10 @@
 
 -(BOOL)hasKeySharpAtIndex:(NSInteger)index
 {
+    if (index == _keys.count) {
+        return NO;
+    }
+    
     NSString *key = _keys[index + 1];
     return key.length == 3;
 }
@@ -208,10 +245,9 @@
 
 #pragma mark - test_scale_major_with_index
 
--(void)test_scale_major_with_index:(NSInteger)index completion:(void (^)(NSArray *))completion
+-(NSArray *)test_scale_major_with_index:(NSInteger)index
 {
-    NSArray *result = [self getScaleOfRootByIndex:index scale:HHScaleMajor outputFormat:HHScaleOutputFormatIndexes];
-    completion(result);
+    return [self getScaleOfRootByIndex:index scale:HHScaleMajor outputFormat:HHScaleOutputFormatIndexes];
 }
 
 @end
