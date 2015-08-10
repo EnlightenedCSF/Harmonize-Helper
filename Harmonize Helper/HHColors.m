@@ -22,4 +22,24 @@
     return kColorRGB(40, 40, 40);
 }
 
++(UIColor *)highlightedWhiteKeyColor
+{
+    return kColorRGB(213, 250, 226);
+}
+
++(UIColor *)highlightedBlackKeyColor
+{
+    return kColorRGB(80, 60, 80);
+}
+
++(UIColor *)playingWhiteKeyColor
+{
+    return kColorRGB(180, 250, 210);
+}
+
++(UIColor *)playingBlackKeyColor
+{
+    return kColorRGB(100, 100, 100);
+}
+
 @end

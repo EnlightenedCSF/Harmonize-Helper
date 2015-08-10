@@ -3,12 +3,57 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "-[HHPianoView touchesEnded:withEvent:]:HHPianoView.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "event.allTouches">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[HHPianoView audioPlayer:didFinishPlayingQueueItemId:withReason:andProgress:andDuration:]:HHPianoView.m">
+      </ContextState>
+      <ContextState
          contextName = "-[HHPianoView highlightKeyWithIndex:]:HHPianoView.m">
          <PersistentStrings>
             <PersistentString
                value = "self.highlightedKeys">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[HHPianoView drawKeys]:HHPianoView.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.isInScaleMode">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[HHKeyboard chordOfKeysPressedWithIndexes:]:HHKeyboard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "i">
+            </PersistentString>
+            <PersistentString
+               value = "chordType">
+            </PersistentString>
+            <PersistentString
+               value = "keys[k]">
+            </PersistentString>
+            <PersistentString
+               value = "j">
+            </PersistentString>
+            <PersistentString
+               value = "intervals">
+            </PersistentString>
+            <PersistentString
+               value = "key">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[HHPianoView processDoubleTouch:]:HHPianoView.m">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

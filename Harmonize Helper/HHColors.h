@@ -14,4 +14,10 @@
 +(UIColor *)whiteKeyColor;
 +(UIColor *)blackKeyColor;
 
++(UIColor *)highlightedWhiteKeyColor;
++(UIColor *)highlightedBlackKeyColor;
+
++(UIColor *)playingWhiteKeyColor;
++(UIColor *)playingBlackKeyColor;
+
 @end

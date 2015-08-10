@@ -1,0 +1,38 @@
+/* 
+  Localizable.strings
+  Harmonize Helper
+
+  Created by Ольферук Александр on 10.08.15.
+  Copyright (c) 2015 Ольферук Александр. All rights reserved.
+*/
+
+
+"HHIntervalPerfUnison" = "Perfect Unison";
+"HHIntervalMinSecond" = "Minor Second";
+"HHIntervalMajSecond" = "Major Second";
+"HHIntervalMinThird" = "Minor Third";
+"HHIntervalMajThird" = "Major Third";
+"HHIntervalPerfFourth" = "Perfect Fourth";
+"HHIntervalAugFourth" = "Augmented Fourth";
+"HHIntervalDimFifth" = "Diminished Fifth";
+"HHIntervalPerfFifth" = "Perfect Fifth";
+"HHIntervalAugFifth" = "Augmented Fifth";
+"HHIntervalMinSixth" = "Minor Sixth";
+"HHIntervalMajSixth" = "Major Sixth";
+"HHIntervalDimSeventh" = "Diminished Seventh";
+"HHIntervalMinSeventh" = "Minor Seventh";
+"HHIntervalMajSeventh" = "Major Seventh";
+"HHIntervalPerfOctave" = "Perfect Octave";
+
+
+"HHChordTypeNone" = "Not a chord";
+"HHChordTypeMajor" = "";
+"HHChordTypeMinor" = "m";
+"HHChordTypeAugmented" = "aug";
+"HHChordTypeDiminished" = "dim";
+"HHChordTypeDomSeventh" = "7";
+"HHChordTypeMinSeventh" = "m7";
+"HHChordTypeMajSeventh" = "M7";
+"HHChordTypeAugSeventh" = "aug7";
+"HHChordTypeDimSeventh" = "dim7";
+"HHChordTypeHalfDimSeventh" = "+7";

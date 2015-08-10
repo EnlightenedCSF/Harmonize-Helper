@@ -14,4 +14,6 @@
 
 -(void)shiftOffsetTo:(CGFloat)value;
 
+-(void)highlightScaleWithTonic:(NSString *)tonic ofType:(NSString *)type;
+
 @end

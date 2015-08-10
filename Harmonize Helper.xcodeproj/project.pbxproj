@@ -73,6 +73,8 @@
 		C2A7DB3F1B749C1000B7AE69 /* 39210__jobro__piano-ff-062.wav in Resources */ = {isa = PBXBuildFile; fileRef = C2A7DAFF1B749C1000B7AE69 /* 39210__jobro__piano-ff-062.wav */; };
 		C2A7DB401B749C1000B7AE69 /* 39211__jobro__piano-ff-063.wav in Resources */ = {isa = PBXBuildFile; fileRef = C2A7DB001B749C1000B7AE69 /* 39211__jobro__piano-ff-063.wav */; };
 		C2A7DB411B749C1000B7AE69 /* 39212__jobro__piano-ff-064.wav in Resources */ = {isa = PBXBuildFile; fileRef = C2A7DB011B749C1000B7AE69 /* 39212__jobro__piano-ff-064.wav */; };
+		C2B794391B78900500C8B7A2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C2B7943B1B78900500C8B7A2 /* Localizable.strings */; };
+		C2B7943F1B78A0C500C8B7A2 /* HHChord.m in Sources */ = {isa = PBXBuildFile; fileRef = C2B7943E1B78A0C500C8B7A2 /* HHChord.m */; };
 		C2F7DCE31B734D4700B06F40 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F7DCE21B734D4700B06F40 /* main.m */; };
 		C2F7DCE61B734D4700B06F40 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F7DCE51B734D4700B06F40 /* AppDelegate.m */; };
 		C2F7DCE91B734D4700B06F40 /* Harmonize_Helper.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C2F7DCE71B734D4700B06F40 /* Harmonize_Helper.xcdatamodeld */; };
@@ -81,7 +83,6 @@
 		C2F7DCF11B734D4700B06F40 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C2F7DCF01B734D4700B06F40 /* Images.xcassets */; };
 		C2F7DCF41B734D4700B06F40 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2F7DCF21B734D4700B06F40 /* LaunchScreen.xib */; };
 		C2F7DD001B734D4700B06F40 /* Harmonize_HelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F7DCFF1B734D4700B06F40 /* Harmonize_HelperTests.m */; };
-		C2F7DD131B734F0A00B06F40 /* HHUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F7DD121B734F0A00B06F40 /* HHUtils.m */; };
 		C2F7DD161B734FC400B06F40 /* HHKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F7DD151B734FC400B06F40 /* HHKeyboard.m */; };
 		C2F7DD191B73523400B06F40 /* HHPianoView.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F7DD181B73523400B06F40 /* HHPianoView.m */; };
 /* End PBXBuildFile section */
@@ -165,6 +166,12 @@
 		C2A7DAFF1B749C1000B7AE69 /* 39210__jobro__piano-ff-062.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "39210__jobro__piano-ff-062.wav"; sourceTree = "<group>"; };
 		C2A7DB001B749C1000B7AE69 /* 39211__jobro__piano-ff-063.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "39211__jobro__piano-ff-063.wav"; sourceTree = "<group>"; };
 		C2A7DB011B749C1000B7AE69 /* 39212__jobro__piano-ff-064.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "39212__jobro__piano-ff-064.wav"; sourceTree = "<group>"; };
+		C2B794371B788FEE00C8B7A2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		C2B794381B788FEE00C8B7A2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		C2B7943A1B78900500C8B7A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C2B7943C1B78900A00C8B7A2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C2B7943D1B78A0C500C8B7A2 /* HHChord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHChord.h; sourceTree = "<group>"; };
+		C2B7943E1B78A0C500C8B7A2 /* HHChord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHChord.m; sourceTree = "<group>"; };
 		C2F7DCDD1B734D4700B06F40 /* Harmonize Helper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Harmonize Helper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2F7DCE11B734D4700B06F40 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C2F7DCE21B734D4700B06F40 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -179,8 +186,6 @@
 		C2F7DCF91B734D4700B06F40 /* Harmonize HelperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Harmonize HelperTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2F7DCFE1B734D4700B06F40 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C2F7DCFF1B734D4700B06F40 /* Harmonize_HelperTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Harmonize_HelperTests.m; sourceTree = "<group>"; };
-		C2F7DD111B734F0A00B06F40 /* HHUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHUtils.h; sourceTree = "<group>"; };
-		C2F7DD121B734F0A00B06F40 /* HHUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHUtils.m; sourceTree = "<group>"; };
 		C2F7DD141B734FC400B06F40 /* HHKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHKeyboard.h; sourceTree = "<group>"; };
 		C2F7DD151B734FC400B06F40 /* HHKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHKeyboard.m; sourceTree = "<group>"; };
 		C2F7DD171B73523400B06F40 /* HHPianoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHPianoView.h; sourceTree = "<group>"; };
@@ -322,6 +327,7 @@
 				C2F7DCE51B734D4700B06F40 /* AppDelegate.m */,
 				C2F7DCE11B734D4700B06F40 /* Info.plist */,
 				C2F7DCE21B734D4700B06F40 /* main.m */,
+				C2B7943B1B78900500C8B7A2 /* Localizable.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -405,10 +411,10 @@
 		C2F7DD101B734EEB00B06F40 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				C2F7DD111B734F0A00B06F40 /* HHUtils.h */,
-				C2F7DD121B734F0A00B06F40 /* HHUtils.m */,
 				C2F7DD141B734FC400B06F40 /* HHKeyboard.h */,
 				C2F7DD151B734FC400B06F40 /* HHKeyboard.m */,
+				C2B7943D1B78A0C500C8B7A2 /* HHChord.h */,
+				C2B7943E1B78A0C500C8B7A2 /* HHChord.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -495,6 +501,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = C2F7DCD41B734D4700B06F40;
 			productRefGroup = C2F7DCDE1B734D4700B06F40 /* Products */;
@@ -529,6 +536,7 @@
 				C2A7DB191B749C1000B7AE69 /* 39171__jobro__piano-ff-024.wav in Resources */,
 				C2A7DB3F1B749C1000B7AE69 /* 39210__jobro__piano-ff-062.wav in Resources */,
 				C2A7DB3E1B749C1000B7AE69 /* 39209__jobro__piano-ff-061.wav in Resources */,
+				C2B794391B78900500C8B7A2 /* Localizable.strings in Resources */,
 				C2A7DB1A1B749C1000B7AE69 /* 39172__jobro__piano-ff-025.wav in Resources */,
 				C2A7DB331B749C1000B7AE69 /* 39198__jobro__piano-ff-050.wav in Resources */,
 				C2A7DB311B749C1000B7AE69 /* 39196__jobro__piano-ff-048.wav in Resources */,
@@ -629,11 +637,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C2F7DD131B734F0A00B06F40 /* HHUtils.m in Sources */,
 				C2F7DD191B73523400B06F40 /* HHPianoView.m in Sources */,
 				C2F7DCE91B734D4700B06F40 /* Harmonize_Helper.xcdatamodeld in Sources */,
 				C2F7DCE61B734D4700B06F40 /* AppDelegate.m in Sources */,
 				C2F7DCEC1B734D4700B06F40 /* ViewController.m in Sources */,
+				C2B7943F1B78A0C500C8B7A2 /* HHChord.m in Sources */,
 				C2F7DD161B734FC400B06F40 /* HHKeyboard.m in Sources */,
 				C2F7DCE31B734D4700B06F40 /* main.m in Sources */,
 				C29D1EBF1B7363D8000F5A97 /* HHColors.m in Sources */,
@@ -659,10 +667,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		C2B7943B1B78900500C8B7A2 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C2B7943A1B78900500C8B7A2 /* Base */,
+				C2B7943C1B78900A00C8B7A2 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		C2F7DCED1B734D4700B06F40 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				C2F7DCEE1B734D4700B06F40 /* Base */,
+				C2B794371B788FEE00C8B7A2 /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -671,6 +689,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				C2F7DCF31B734D4700B06F40 /* Base */,
+				C2B794381B788FEE00C8B7A2 /* ru */,
 			);
 			name = LaunchScreen.xib;
 			sourceTree = "<group>";

@@ -9,21 +9,31 @@
 #import "HHPianoView.h"
 #import "HHColors.h"
 #import "HHKeyboard.h"
+#import "HHChord.h"
 
 #import <LGHelper.h>
+
+@import AVFoundation;
+
 #import <STKAudioPlayer.h>
 
 #define WHITE_KEYS_COUNT 52
-#define WIDTH_HEIGHT_RATIO 5.0f
+#define WIDTH_HEIGHT_RATIO 4.0f
 
 #define NUMBER_IN_FILENAME 39148
 #define REST_OF_THE_FILENAME @"__jobro__piano-ff-0"
 
-@interface HHPianoView () <STKAudioPlayerDelegate>
+typedef enum : NSUInteger {
+    HHShowingModeNone = 0,
+    HHShowingModeScale,
+    HHShowingModeInterval,
+    HHShowingModeChord
+} HHShowingMode;
+
+@interface HHPianoView () <AVAudioPlayerDelegate>
 
 @property (weak, nonatomic) HHKeyboard *keyboard;
 
-//@property (strong, nonatomic) STKAudioPlayer *player;
 @property (strong, nonatomic) NSMutableArray *players;
 
 @property (assign, nonatomic) CGFloat offsetX;
@@ -47,7 +57,12 @@
 
 @property (strong, nonatomic) NSArray *keyAssistLabelColors;
 
-@property (assign, nonatomic) BOOL isSingleTapHolding;
+@property (assign, nonatomic) HHShowingMode mode;
+
+@property (assign, nonatomic) BOOL isInScaleMode;
+@property (assign, nonatomic) HHScale scaleType;
+@property (assign, nonatomic) HHNote scaleTonic;
+
 @property (strong, nonatomic) NSMutableArray *highlightedWhiteKeys;
 @property (strong, nonatomic) NSMutableArray *highlightedBlackKeys;
 
@@ -74,7 +89,6 @@
 
 -(void)setup
 {
-    //_player = [[STKAudioPlayer alloc] init];
     self.multipleTouchEnabled = YES;
     
     _players = [NSMutableArray array];
@@ -110,7 +124,10 @@
                                ];
     _highlightedWhiteKeys = [NSMutableArray arrayWithArray:@[]];
     _highlightedBlackKeys = [NSMutableArray arrayWithArray:@[]];
-    _isSingleTapHolding = NO;
+    
+    _mode = HHShowingModeNone;
+    
+    _isInScaleMode = NO;
 }
 
 -(void)setOffsetX:(CGFloat)offsetX
@@ -140,8 +157,23 @@
         [self drawKeyAssistLabels];
     }
     
-    if (_isSingleTapHolding && (self.highlightedWhiteKeys.count > 0 || self.highlightedBlackKeys.count > 0)) {
-        [self drawHighlightedKeys];
+    switch (_mode) {
+        case HHShowingModeScale:
+            if (self.highlightedWhiteKeys.count > 0 || self.highlightedBlackKeys.count > 0) {
+                [self drawHighlightedKeys];
+            }
+            break;
+            
+        case HHShowingModeInterval:
+            [self drawInterval];
+            break;
+        
+        case HHShowingModeChord:
+            [self drawChord];
+            break;
+            
+        default:
+            break;
     }
 }
 
@@ -152,13 +184,19 @@
 
 -(void)drawKeys
 {
-    [[HHColors whiteKeyColor] setFill];
     [[HHColors blackKeyColor] setStroke];
     
-    CGFloat s = - (int)round(-_offsetX) % (int)round(_keyWidth);
-    
     for (NSInteger i = 0; i < _whiteKeysCount + 1; ++i) {
-        UIBezierPath *whiteKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(s + i*_keyWidth,       // x
+        
+        if (self.isInScaleMode && [self isKeyInHighlightedScaleWithIndex:[_keyboard indexOfKeyByWhiteKeyNumber:(i + _firstWhiteKeyIndex)]]) {
+            [[HHColors highlightedWhiteKeyColor] setFill];
+        }
+        else {
+            [[HHColors whiteKeyColor] setFill];
+        }
+        
+        UIBezierPath *whiteKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(
+                                                                                 [self xCoordForKeyWithIndex:i isBlack:NO],
                                                                                  0,                     // y
                                                                                  _keyWidth,
                                                                                  _keyHeight)];
@@ -167,12 +205,14 @@
     }
     
     
-    [[HHColors blackKeyColor] setFill];
     [[UIColor blackColor] setStroke];
 
     
     //    | ## ## | ## ## ## |
     //    | ## ## | ## ## ## |
+    //    | ## ## | ## ## ## |
+    //    | ## ## | ## ## ## |
+    //    |       |          |
     
     for (NSInteger i = 0; i < _whiteKeysCount + 1; ++i) {
         
@@ -180,11 +220,15 @@
             continue;
         }
         
-        CGFloat s = (int)round(-_offsetX) % (int)round(_keyWidth);
-        s = _keyWidth - s;
-        s -= _blackKeyWidth/2.0f;
+        if (self.isInScaleMode && [self isKeyInHighlightedScaleWithIndex:[_keyboard indexOfKeyByWhiteKeyNumber:(i + _firstWhiteKeyIndex) andSharp:YES]]) {
+            [[HHColors highlightedBlackKeyColor] setFill];
+        }
+        else {
+            [[HHColors blackKeyColor] setFill];
+        }
         
-        UIBezierPath *blackKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(s + i*_keyWidth,
+        UIBezierPath *blackKeyPath = [UIBezierPath bezierPathWithRect:CGRectMake(
+                                                                                 [self xCoordForKeyWithIndex:i isBlack:YES],
                                                                                  0,
                                                                                  _blackKeyWidth,
                                                                                  _blackKeyHeight)];
@@ -193,10 +237,128 @@
     }
 }
 
+-(BOOL)isKeyInHighlightedScaleWithIndex:(NSInteger)index {
+    if (!self.isInScaleMode) {
+        return NO;
+    }
+    return [_keyboard isKeyWithIndex:index inScaleWithTonic:self.scaleTonic ofScaleType:self.scaleType];
+}
+
 -(BOOL)indexIsBad:(NSInteger)i
 {
     NSInteger realKeyIndex = [_keyboard indexOfKeyByWhiteKeyNumber:(_firstWhiteKeyIndex + i)];
     return ![_keyboard hasKeySharpAtIndex:realKeyIndex];
+}
+
+
+-(CGFloat)xCoordForKeyWithIndex:(NSInteger)index isBlack:(BOOL)isBlack
+{
+//    NSInteger white = [_keyboard whiteKeyIndexByIndexOfKey:index];
+//    white -= _firstWhiteKeyIndex;
+    
+    int mult = isBlack ? 1 : -1;
+    CGFloat s = mult * (int)round(-_offsetX) % (int)round(_keyWidth); // на сколько первая белая клавиша сдвинута
+    if (isBlack) {
+        s = _keyWidth - s;
+        s -= _blackKeyWidth/2.0f;
+    }
+    return s + index*_keyWidth;
+} // todo
+
+-(CGFloat)xCoordForKeyWithKeyboardIndex:(NSInteger)index
+{
+    NSInteger whiteIndex = [_keyboard whiteKeyIndexByIndexOfKey:index];
+    whiteIndex -= _firstWhiteKeyIndex;
+    
+    CGFloat shift = (int)round(-_offsetX) % (int)round(_keyWidth);
+    CGFloat result = whiteIndex * _keyWidth - shift;
+
+    if ([_keyboard isKeyBlackAtIndex:index]) {
+        result += _blackKeyShift;
+    }
+    
+    return result;
+} // this method is ok
+
+
+-(void)drawChord
+{
+    HHChord *chord = [_keyboard chordOfKeysPressedWithIndexes:[_highlightedWhiteKeys copy]];
+    
+        NSLog(@"This is %@", chord);
+    
+    if (chord.type == HHChordTypeNone)
+        return;
+    
+    NSMutableArray *xs = [NSMutableArray array];
+    for (id item in _highlightedWhiteKeys) {
+        [xs addObject:@([self xCoordForKeyWithKeyboardIndex:[item intValue]])];
+    }
+    
+    NSNumber *minX = [xs valueForKeyPath:@"@min.self"];
+    NSNumber *maxX = [xs valueForKeyPath:@"@max.self"];
+    
+    UIColor *color = _keyAssistLabelColors[0];
+    [color set];
+    
+    CGRect rect = CGRectMake([minX floatValue] + _keyWidth/2.0,
+                             _blackKeyHeight - _keyWidth * 2.0f,
+                             [maxX floatValue] - [minX floatValue],
+                             25.0f);
+    UIBezierPath *rectPath = [UIBezierPath bezierPathWithRect:rect];
+    [rectPath fill];
+    
+    NSString *chordDescription = [NSString stringWithFormat:@"%@", chord];
+    CGSize size = [chordDescription sizeWithAttributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:16.0f] }];
+    CGRect labelRect = CGRectMake(rect.origin.x + 30.0f,
+                                  rect.origin.y - size.height,
+                                  size.width,
+                                  size.height);
+    
+    color = _keyAssistLabelColors[1];
+    [chordDescription drawInRect:labelRect withAttributes:@{ NSBackgroundColorAttributeName: color,
+                                                             NSFontAttributeName: [UIFont systemFontOfSize:16.0],
+                                                             NSForegroundColorAttributeName: [UIColor whiteColor] }];
+}
+
+
+-(void)drawInterval
+{
+    NSInteger index1 = [_highlightedWhiteKeys[0] integerValue];
+    NSInteger index2 = [_highlightedWhiteKeys[1] integerValue];
+    
+    CGFloat x1 = [self xCoordForKeyWithKeyboardIndex:index1];
+    CGFloat x2 = [self xCoordForKeyWithKeyboardIndex:index2];
+    
+    BOOL bothAreWhite = [_keyboard isKeyWhiteAtIndex:index1] && [_keyboard isKeyWhiteAtIndex:index2];
+    
+    UIColor *navy = _keyAssistLabelColors[3];
+    [navy set];
+    
+    CGRect rect = CGRectMake(MIN(x1, x2) + _keyWidth/2.0, // x
+                             (bothAreWhite ? _keyHeight - 80.0 : _keyHeight - 170.0),
+                             fabs(x1-x2),
+                             25.0f);
+    
+    UIBezierPath *line = [UIBezierPath bezierPathWithRect:rect];
+    [line fill];
+    
+    NSInteger distance = [_keyboard intervalBetweenNotesWithIndex:index1 andIndex:index2];
+    NSString *s = [_keyboard getLocalizedIntervalName:distance];
+    CGSize size = [s sizeWithAttributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:16.0f] }];
+    
+    UIColor *orange = _keyAssistLabelColors[1];
+    [orange set];
+    
+    CGRect label = CGRectMake(rect.origin.x,
+                              rect.origin.y - size.height,
+                              size.width,
+                              size.height);
+    UIBezierPath *labelPath = [UIBezierPath bezierPathWithRect:label];
+    [labelPath fill];
+    
+    [s drawInRect:label withAttributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:16.0f],
+                               NSForegroundColorAttributeName: [UIColor whiteColor] }];
 }
 
 -(void)drawKeyAssistLabels
@@ -205,14 +367,14 @@
 
     for (NSInteger i = 0; i < _whiteKeysCount; ++i)
     {
-        CGRect keyAssistLabelRect = CGRectMake(s + i*_keyWidth + _keyAssistLabelOffsetX,  //_offsetX + i*_keyWidth + _keyAssistLabelOffsetX,
+        CGRect keyAssistLabelRect = CGRectMake(s + i*_keyWidth + _keyAssistLabelOffsetX,
                                                _keyAssistLabelOffsetY,
                                                _keyAssistLabelWidth,
                                                _keyAssistLabelHeight);
         
         UIBezierPath *rect = [UIBezierPath bezierPathWithRect:keyAssistLabelRect];
-        NSString *keyString = [_keyboard getKeyAtIndex:[_keyboard indexOfKeyByWhiteKeyNumber:(_firstWhiteKeyIndex + i)]];
-        [[_keyAssistLabelColors objectAtIndex:[_keyboard getNoteIndexInOctave:keyString]] setFill];
+        NSString *keyString = [_keyboard keyAtIndex:[_keyboard indexOfKeyByWhiteKeyNumber:(_firstWhiteKeyIndex + i)]];
+        [[_keyAssistLabelColors objectAtIndex:[_keyboard noteIndexInOctave:keyString]] setFill];
         
         [rect fill];
         [keyString drawInRect:keyAssistLabelRect withAttributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:20.0f],
@@ -316,7 +478,7 @@
     [self clearHighlights];
     [self highlightKeysWithIndexes:highlights];
     
-    [self playKeyWithIndex:index];
+    //[self playKeyWithIndex:index]; // вынести это отсюда
 }
 
 -(void)processDoubleTouch:(NSSet *)touches
@@ -328,9 +490,18 @@
     NSInteger index1 = [self getIndexOfKeyPressed:first];
     NSInteger index2 = [self getIndexOfKeyPressed:second];
     
-    NSInteger distance = [_keyboard getDistanceBetweenNotesWithIndex:index1 andIndex:index2];
-    
-    NSLog(@"The distance is: %lu", distance);    
+    [self.highlightedWhiteKeys addObject:@(index1)];
+    [self.highlightedWhiteKeys addObject:@(index2)];
+}
+
+-(void)processMultipleTouch:(NSSet *)touches
+{
+    [self clearHighlights];
+ 
+    NSArray *orderedTouched = [touches allObjects];
+    for (UITouch *touch in orderedTouched) {
+        [_highlightedWhiteKeys addObject:@([self getIndexOfKeyPressed:touch])];
+    }
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -341,33 +512,54 @@
         
         // single tap; showing scale
         case 1: {
-            NSLog(@"Single began");
-            _isSingleTapHolding = YES;
+//            NSLog(@"Single began");
+            NSLog(@"Single began; touches: %lu, events.allTouches: %lu", (unsigned long)touches.count, (unsigned long)event.allTouches.count);
+
+            
+            _mode = HHShowingModeScale;
             UITouch *touch = [[event allTouches] anyObject];
             [self processSingleTouch:touch];
+            [self playKeyWithIndex:[self getIndexOfKeyPressed:touch]];
             break;
         }
             
         // double tap; showing interval
         case 2: {
-            if (_isSingleTapHolding) {
+            if (_mode == HHShowingModeScale) {
                 [self clearHighlights];
             }
             
-            NSLog(@"Double began");
+            NSLog(@"Double began; touches: %lu, events.allTouches: %lu", (unsigned long)touches.count, (unsigned long)event.allTouches.count);
+            
+            _mode = HHShowingModeInterval;
             [self processDoubleTouch:event.allTouches];
+            
+            for (UITouch *touch in event.allTouches) {
+                if (![touches containsObject:touch]) {
+                    continue;
+                }
+                [self playKeyWithIndex:[self getIndexOfKeyPressed:touch]];
+            }
+            
             break;
         }
             
-        // 3 or 4; showing chord
-        case 3:
-        case 4: {
+        // 3 or more; showing chord
+        default: {
             NSLog(@"Triple began");
             
+            _mode = HHShowingModeChord;
+            [self processMultipleTouch:event.allTouches];
+            
+            for (UITouch *touch in event.allTouches) {
+                if (![touches containsObject:touch]) {
+                    continue;
+                }
+                [self playKeyWithIndex:[self getIndexOfKeyPressed:touch]];
+            }
+            
             break;
         }
-        default:
-            break;
     }
     [self setNeedsDisplay];
 }
@@ -377,40 +569,69 @@
     switch (event.allTouches.count) {
         case 1: {
             NSLog(@"Single ended");
-            _isSingleTapHolding = NO;
+            _mode = HHShowingModeNone;
             break;
         }
         case 2: {
             NSLog(@"Double ended");
             
-            UITouch *takenOff = [touches anyObject];
-            for (UITouch *touch in event.allTouches) {
-                if (takenOff != touch) {
-                    [self processSingleTouch:touch]; // process not the taken off, but the left on the screen finger
-                    break;
+            if (touches.count == event.allTouches.count) { // убрали сразу оба пальца
+                _mode = HHShowingModeNone;
+                [self clearHighlights];
+            }
+            else {
+                UITouch *takenOff = [touches anyObject];
+                for (UITouch *touch in event.allTouches) {
+                    if (takenOff != touch)
+                    {
+                    
+                        _mode = HHShowingModeScale;
+                        [self processSingleTouch:touch]; // process not the taken off, but the left on the screen finger
+                        break;
+                    }
                 }
             }
             break;
         }
-        case 3:
-        case 4: {
-            NSLog(@"Triple or more ended");
-            
+        default: {
+//            NSLog(@"Triple or more ended");
+            NSLog(@"Multiple ended; touches: %lu, events.allTouches: %lu", (unsigned long)touches.count, (unsigned long)event.allTouches.count);
+
+            long fingersLeft = event.allTouches.count - touches.count;
+            switch (fingersLeft) {
+                case 2: {
+                    _mode = HHShowingModeInterval;
+                    
+                    NSMutableSet *twoTouches = [NSMutableSet set];
+                    for (UITouch *t in event.allTouches) {
+                        if (![touches containsObject:t]) {
+                            [twoTouches addObject:t];
+                        }
+                    }
+                    [self processDoubleTouch:twoTouches];
+                    
+                    break;
+                }
+                case 1: {
+                    _mode = HHShowingModeScale;
+                    
+                    for (UITouch *t in event.allTouches) {
+                        if (![touches containsObject:t]) {
+                            [self processSingleTouch:t];
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default:
+                    _mode = HHShowingModeNone;
+                    [self clearHighlights];
+                    break;
+            }
             break;
         }
-        default:
-            break;
     }
     [self setNeedsDisplay];
-}
-
--(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-    NSLog(@"Cancelled");
 }
 
 #pragma mark - Playing sounds
@@ -429,34 +650,87 @@
 {
     NSString *fileName = [self getCorrectFileNameOfNoteWithIndex:index];
     
-    STKAudioPlayer *player = [[STKAudioPlayer alloc] init];
-    player.delegate = self;
-    [_players addObject:player];
-    
     NSURL *url = kMainBundleDirectoryURL;
     url = [url URLByAppendingPathComponent:fileName];
     
-    [player play:[url absoluteString]];
+    NSError *error;
+    AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&error];
+    player.delegate = self;
+    
+    [_players addObject:player];
+    
+    [player play];
 }
 
-#pragma mark - STK Delegate
+#pragma mark - Audio player Delegate
 
--(void)audioPlayer:(STKAudioPlayer *)audioPlayer didFinishPlayingQueueItemId:(NSObject *)queueItemId withReason:(STKAudioPlayerStopReason)stopReason andProgress:(double)progress andDuration:(double)duration
+-(void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
-    [_players removeObject:audioPlayer];
+    [_players removeObject:player];
 }
-
--(void)audioPlayer:(STKAudioPlayer *)audioPlayer didFinishBufferingSourceWithQueueItemId:(NSObject *)queueItemId {}
--(void)audioPlayer:(STKAudioPlayer *)audioPlayer didStartPlayingQueueItemId:(NSObject *)queueItemId {}
--(void)audioPlayer:(STKAudioPlayer *)audioPlayer stateChanged:(STKAudioPlayerState)state previousState:(STKAudioPlayerState)previousState {}
--(void)audioPlayer:(STKAudioPlayer *)audioPlayer unexpectedError:(STKAudioPlayerErrorCode)errorCode {}
 
 #pragma mark - Controls
 
 -(void)shiftOffsetTo:(CGFloat)value
 {
     self.offsetX = -value * (_keyboardWidth - self.bounds.size.width - 120);
-//    NSLog(@"Value = %f; Offset is %f; width is %f", value, self.offsetX, self.bounds.size.width);
+    [self setNeedsDisplay];
+}
+
+-(void)highlightScaleWithTonic:(NSString *)tonic ofType:(NSString *)type
+{
+    if ([@"None" isEqualToString:tonic]) {
+        self.isInScaleMode = NO;
+        [self setNeedsDisplay];
+        return;
+    }
+    
+    self.isInScaleMode = YES;
+    
+    if ([@"Major" isEqualToString:type]) {
+        self.scaleType = HHScaleMajor;
+    }
+    else {
+        self.scaleType = HHScaleMinor;
+    }
+    
+    if ([@"C" isEqualToString:tonic]) {
+        self.scaleTonic = C;
+    }
+    else if ([@"C#" isEqualToString:tonic]) {
+        self.scaleTonic = CSharp;
+    }
+    else if ([@"D" isEqualToString:tonic]) {
+        self.scaleTonic = D;
+    }
+    else if ([@"D#" isEqualToString:tonic]) {
+        self.scaleTonic = DSharp;
+    }
+    else if ([@"E" isEqualToString:tonic]) {
+        self.scaleTonic = E;
+    }
+    else if ([@"F" isEqualToString:tonic]) {
+        self.scaleTonic = F;
+    }
+    else if ([@"F#" isEqualToString:tonic]) {
+        self.scaleTonic = FSharp;
+    }
+    else if ([@"G" isEqualToString:tonic]) {
+        self.scaleTonic = G;
+    }
+    else if ([@"G#" isEqualToString:tonic]) {
+        self.scaleTonic = GSharp;
+    }
+    else if ([@"A" isEqualToString:tonic]) {
+        self.scaleTonic = A;
+    }
+    else if ([@"A#" isEqualToString:tonic]) {
+        self.scaleTonic = ASharp;
+    }
+    else if ([@"B" isEqualToString:tonic]) {
+        self.scaleTonic = B;
+    }
+    
     [self setNeedsDisplay];
 }
 

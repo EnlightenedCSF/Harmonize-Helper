@@ -8,6 +8,23 @@
 
 #import <Foundation/Foundation.h>
 
+@class HHChord;
+
+typedef enum : NSUInteger {
+    C = 0,
+    CSharp,
+    D,
+    DSharp,
+    E,
+    F,
+    FSharp,
+    G,
+    GSharp,
+    A,
+    ASharp,
+    B
+} HHNote;
+
 typedef enum : NSUInteger {
     HHScaleMajor = 0,
     HHScaleMinor
@@ -27,10 +44,12 @@ typedef enum : NSUInteger {
     
     HHIntervalDimFifth = 6,
     HHIntervalPerfFifth = 7,
+    HHIntervalAugFifth = 8,
     
     HHIntervalMinSixth = 8,
     HHIntervalMajSixth = 9,
     
+    HHIntervalDimSeventh = 9,
     HHIntervalMinSeventh = 10,
     HHIntervalMajSeventh = 11,
     
@@ -38,17 +57,18 @@ typedef enum : NSUInteger {
 } HHInterval;
 
 typedef enum : NSUInteger {
-    HHChordMajor,
-    HHChordMinor,
-    HHChordAugmented,
-    HHChordDiminished,
-    HHChordDomSeventh,
-    HHChordMinSeventh,
-    HHChordMajSeventh,
-    HHChordAugSeventh,
-    HHChordDimSeventh,
-    HHChordHalfDimSeventh
-} HHChord;
+    HHChordTypeNone,
+    HHChordTypeMajor,
+    HHChordTypeMinor,
+    HHChordTypeAugmented,
+    HHChordTypeDiminished,
+    HHChordTypeDomSeventh,
+    HHChordTypeMinSeventh,
+    HHChordTypeMajSeventh,
+    HHChordTypeAugSeventh,
+    HHChordTypeDimSeventh,
+    HHChordTypeHalfDimSeventh
+} HHChordType;
 
 typedef enum : NSUInteger {
     HHScaleOutputFormatIndexes = 0,
@@ -60,6 +80,7 @@ typedef enum : NSUInteger {
 +(HHKeyboard *)sharedKeyboard;
 
 -(BOOL)isKeyWhiteAtIndex:(NSInteger)index;
+-(BOOL)isKeyBlackAtIndex:(NSInteger)index;
 -(BOOL)hasKeyFlatAtIndex:(NSInteger)index;
 -(BOOL)hasKeySharpAtIndex:(NSInteger)index;
 
@@ -67,14 +88,19 @@ typedef enum : NSUInteger {
 -(NSInteger)indexOfKeyByWhiteKeyNumber:(NSInteger)index;
 -(NSInteger)whiteKeyIndexByIndexOfKey:(NSInteger)index;
 
--(NSString *)getKeyAtIndex:(NSInteger) index;
--(NSInteger)getNoteIndexInOctave:(NSString *)key;
+-(NSString *)keyAtIndex:(NSInteger) index;
+-(NSInteger)noteIndexInOctave:(NSString *)key;
 
--(NSArray *)getMelodicIntervalsOfScale:(HHScale)scale;
--(NSArray *)getScaleOfRootByIndex:(NSInteger)root scale:(HHScale)scale outputFormat:(HHScaleOutputFormat)format;
--(NSArray *)getScaleOfRootByIndex:(NSInteger)root scale:(HHScale)scale outputFormat:(HHScaleOutputFormat)format continious:(BOOL)continious;
+-(NSArray *)melodicIntervalsOfScale:(HHScale)scale;
+-(NSArray *)scaleOfRootByIndex:(NSInteger)root scale:(HHScale)scale outputFormat:(HHScaleOutputFormat)format;
+-(NSArray *)scaleOfRootByIndex:(NSInteger)root scale:(HHScale)scale outputFormat:(HHScaleOutputFormat)format continious:(BOOL)continious;
+-(BOOL)isKeyWithIndex:(NSInteger)index inScaleWithTonic:(HHNote)tonic ofScaleType:(HHScale)scaleType;
 
--(HHInterval)getDistanceBetweenNotesWithIndex:(NSInteger)index andIndex:(NSInteger)anotherIndex;
+
+-(HHInterval)intervalBetweenNotesWithIndex:(NSInteger)index andIndex:(NSInteger)anotherIndex;
+-(NSString *)getLocalizedIntervalName:(HHInterval)interval;
+
+-(HHChord *)chordOfKeysPressedWithIndexes:(NSArray *)keys;
 
 -(NSArray *)test_scale_major_with_index:(NSInteger)index;
 

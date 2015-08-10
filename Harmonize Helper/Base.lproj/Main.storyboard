@@ -43,24 +43,58 @@
                                     <action selector="pianoOffsetChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="mR4-Un-KJn"/>
                                 </connections>
                             </slider>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cXU-Fs-JQh">
+                                <rect key="frame" x="386" y="13" width="95" height="162"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="2Aw-kS-2fH"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Itk-tj-nkA"/>
+                                </connections>
+                            </pickerView>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="duj-82-36B">
+                                <rect key="frame" x="489" y="12" width="95" height="162"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="95" id="Jkg-n8-77m"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="2MZ-Yb-pFv"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Iu0-Jj-qBF"/>
+                                </connections>
+                            </pickerView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scale:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fCT-Mn-alF">
+                                <rect key="frame" x="330" y="82" width="48" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="duj-82-36B" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="53U-dh-atz"/>
+                            <constraint firstItem="VQM-9r-L2s" firstAttribute="top" secondItem="cXU-Fs-JQh" secondAttribute="bottom" id="7yX-W0-Xbv"/>
                             <constraint firstItem="wLV-yf-GsM" firstAttribute="centerY" secondItem="K0k-91-zte" secondAttribute="centerY" id="BK2-wg-b27"/>
                             <constraint firstAttribute="centerY" secondItem="VQM-9r-L2s" secondAttribute="centerY" id="Dac-E4-vOU"/>
+                            <constraint firstItem="VQM-9r-L2s" firstAttribute="top" secondItem="duj-82-36B" secondAttribute="bottom" constant="8" id="Ede-Yi-fYI"/>
+                            <constraint firstItem="cXU-Fs-JQh" firstAttribute="leading" secondItem="fCT-Mn-alF" secondAttribute="trailing" constant="8" id="ZHc-vv-U2X"/>
                             <constraint firstItem="VQM-9r-L2s" firstAttribute="top" secondItem="wLV-yf-GsM" secondAttribute="bottom" constant="59" id="bDg-dq-1PD"/>
+                            <constraint firstItem="duj-82-36B" firstAttribute="leading" secondItem="cXU-Fs-JQh" secondAttribute="trailing" constant="8" id="cf0-EP-b7t"/>
                             <constraint firstItem="wLV-yf-GsM" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="fFb-EH-FjH"/>
+                            <constraint firstItem="cXU-Fs-JQh" firstAttribute="width" secondItem="duj-82-36B" secondAttribute="width" id="gga-ZD-7OE"/>
                             <constraint firstItem="VQM-9r-L2s" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="mlE-mH-LkZ"/>
                             <constraint firstItem="lig-fP-WiT" firstAttribute="top" secondItem="VQM-9r-L2s" secondAttribute="bottom" constant="8" id="oyx-O6-bhG"/>
                             <constraint firstAttribute="centerX" secondItem="VQM-9r-L2s" secondAttribute="centerX" id="qZX-aL-CCg"/>
+                            <constraint firstItem="duj-82-36B" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="slZ-iP-DaB"/>
                             <constraint firstItem="lig-fP-WiT" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="suL-We-l4I"/>
                             <constraint firstItem="K0k-91-zte" firstAttribute="leading" secondItem="wLV-yf-GsM" secondAttribute="trailing" constant="8" id="vVa-GV-Kde"/>
                             <constraint firstItem="lig-fP-WiT" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="vui-KZ-tCa"/>
                             <constraint firstAttribute="trailing" secondItem="VQM-9r-L2s" secondAttribute="trailing" id="wjg-fb-WUi"/>
+                            <constraint firstItem="cXU-Fs-JQh" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="-7" id="xQl-gV-dZM"/>
+                            <constraint firstItem="fCT-Mn-alF" firstAttribute="centerY" secondItem="cXU-Fs-JQh" secondAttribute="centerY" constant="-1.5" id="yDf-wZ-d4w"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="piano" destination="VQM-9r-L2s" id="cro-xG-JI7"/>
+                        <outlet property="scaleTonicPickerView" destination="cXU-Fs-JQh" id="5gs-AJ-plb"/>
+                        <outlet property="scaleTypePickerView" destination="duj-82-36B" id="iSK-3x-h2X"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

@@ -1,0 +1,38 @@
+/* 
+  Localizable.strings
+  Harmonize Helper
+
+  Created by Ольферук Александр on 10.08.15.
+  Copyright (c) 2015 Ольферук Александр. All rights reserved.
+*/
+
+
+"HHIntervalPerfUnison" = "Чистая Прима";
+"HHIntervalMinSecond" = "Малая Секунда";
+"HHIntervalMajSecond" = "Большая Секунда";
+"HHIntervalMinThird" = "Малая Терция";
+"HHIntervalMajThird" = "Большая Терция";
+"HHIntervalPerfFourth" = "Чистая Кварта";
+"HHIntervalAugFourth" = "Увеличенная Кварта";
+"HHIntervalDimFifth" = "Diminished Fifth";
+"HHIntervalPerfFifth" = "Perfect Fifth";
+"HHIntervalAugFifth" = "Augmented Fifth";
+"HHIntervalMinSixth" = "Малая Секста";
+"HHIntervalMajSixth" = "Большая Секста";
+"HHIntervalDimSeventh" = "Diminished Seventh";
+"HHIntervalMinSeventh" = "Малая септима";
+"HHIntervalMajSeventh" = "Большая Септима";
+"HHIntervalPerfOctave" = "Чистая Октава";
+
+
+"HHChordTypeNone" = "Не аккорд";
+"HHChordTypeMajor" = "";
+"HHChordTypeMinor" = "m";
+"HHChordTypeAugmented" = "aug";
+"HHChordTypeDiminished" = "dim";
+"HHChordTypeDomSeventh" = "7";
+"HHChordTypeMinSeventh" = "m7";
+"HHChordTypeMajSeventh" = "M7";
+"HHChordTypeAugSeventh" = "aug7";
+"HHChordTypeDimSeventh" = "dim7";
+"HHChordTypeHalfDimSeventh" = "+7";
